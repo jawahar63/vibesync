@@ -243,12 +243,13 @@ export class PlayerService {
 
   private async handleVisibilityChange() {
     document.addEventListener('visibilitychange', async () => {
-      if (document.hidden) {
-        console.log("App is in the background or phone is locked.");
-        await this.enablePiP(); // Enable PiP automatically
+      if (document.hidden && this.isMobile() && this.isPWA()) {
+        console.log("App is in background or phone is locked (PWA Mobile). Enabling PiP...");
+        await this.enablePiP(); // Enable PiP only on PWA & mobile
       }
     });
   }
+
 
   private enablePiPLocal(player: any) {
   document.addEventListener('visibilitychange', async () => {
@@ -290,6 +291,15 @@ export class PlayerService {
       navigator.serviceWorker.controller.postMessage({ type });
     }
   }
+
+  private isMobile(): boolean {
+    return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  }
+
+  private isPWA(): boolean {
+    return (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true);
+  }
+
 
 
 
