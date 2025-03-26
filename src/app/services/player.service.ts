@@ -179,7 +179,7 @@ export class PlayerService {
         events: {
           onReady: (event: any) => {
             event.target.playVideo();
-            this.enablePiP(event.target);
+            this.enablePiPLocal(event.target);
           },
           onStateChange: (event: any) => {
             if (event.data === window.YT.PlayerState.PLAYING) {
@@ -241,34 +241,43 @@ export class PlayerService {
   }
 
 
-  private handleVisibilityChange() {
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) {
-        console.log("Chrome is active (foreground)");
-
-        // ✅ Resume playback if it was playing before
-        setTimeout(() => {
-            console.log("🔄 Resuming playback...");
-            this.play();
-          }, 0);
-      } else {
-        console.log("Chrome is inactive (backgrounded)");
-
-            console.log("🔄 Resuming playback...");
-            this.play();
+  private async handleVisibilityChange() {
+    document.addEventListener('visibilitychange', async () => {
+      if (document.hidden) {
+        console.log("App is in the background or phone is locked.");
+        await this.enablePiP(); // Enable PiP automatically
       }
     });
   }
-  private enablePiP(player: any) {
-    document.addEventListener('visibilitychange', async () => {
-      if (document.hidden && player && player.getIframe) {
-        const videoElement = player.getIframe();
-        if (videoElement.requestPictureInPicture) {
+
+  private enablePiPLocal(player: any) {
+  document.addEventListener('visibilitychange', async () => {
+    if (document.hidden && player && player.getIframe) {
+      const videoElement = player.getIframe();
+      if (videoElement.requestPictureInPicture) {
+        await videoElement.requestPictureInPicture();
+      }
+    }
+  });
+}
+
+
+  private async enablePiP() {
+  if (document.pictureInPictureElement) return; // Already in PiP mode
+
+    if (this.ytPlayer && this.ytPlayer.getIframe) {
+      const videoElement = this.ytPlayer.getIframe();
+
+      if (videoElement.requestPictureInPicture) {
+        try {
           await videoElement.requestPictureInPicture();
+        } catch (err) {
+          console.error('Failed to enable PiP:', err);
         }
       }
-    });
+    }
   }
+
 
 
 
