@@ -38,3 +38,22 @@ self.addEventListener('visibilitychange', () => {
     });
   }
 });
+
+self.addEventListener('message', (event) => {
+  if (event.data.type === 'PLAY') {
+    self.registration.showNotification("Now Playing", {
+      body: "Tap to return to the player",
+      icon: "/assets/icons/icon-192x192.png",
+      badge: "/assets/icons/icon-192x192.png",
+      actions: [{ action: "open", title: "Open Player" }]
+    });
+  }
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  event.waitUntil(
+    clients.openWindow('/') // Opens the app when clicking on the notification
+  );
+});
+

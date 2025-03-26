@@ -241,15 +241,20 @@ export class PlayerService {
 
 
   private handleVisibilityChange() {
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) {
-        console.log("Chrome is inactive (backgrounded)");
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      console.log("Chrome is active (foreground)");
+
+      // ✅ Resume playback if it was playing before
+      if (this.isPlaying$.value) {
         this.play();
-      } else {
-        console.log("Chrome is active (foreground)");
       }
-    });
-  }
+    } else {
+      console.log("Chrome is inactive (backgrounded)");
+    }
+  });
+}
+
 
 
 
