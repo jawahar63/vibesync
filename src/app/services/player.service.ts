@@ -179,7 +179,6 @@ export class PlayerService {
         events: {
           onReady: (event: any) => {
             event.target.playVideo();
-            this.enablePiPLocal(event.target);
             this.updateYtDuration();
           },
           onStateChange: (event: any) => {
@@ -253,33 +252,36 @@ export class PlayerService {
   }
 
 
-  private enablePiPLocal(player: any) {
-  document.addEventListener('visibilitychange', async () => {
-    if (document.hidden && player && player.getIframe) {
-      const videoElement = player.getIframe();
-      if (videoElement.requestPictureInPicture) {
-        await videoElement.requestPictureInPicture();
-      }
-    }
-  });
-}
 
 
   private async enablePiP() {
-  if (document.pictureInPictureElement) return; // Already in PiP mode
-  console.log(1)
-    if (this.ytPlayer && this.ytPlayer.getIframe) {
+    if (document.pictureInPictureElement) return; // Prevent multiple PiP calls
+    console.log("Attempting to enable PiP...");
+
+    if (this.currentSource === 'youtube' && this.ytPlayer?.getIframe) {
       const videoElement = this.ytPlayer.getIframe();
 
       if (videoElement.requestPictureInPicture) {
         try {
           await videoElement.requestPictureInPicture();
+          console.log("PiP enabled for YouTube");
         } catch (err) {
-          console.error('Failed to enable PiP:', err);
+          console.error("Failed to enable PiP:", err);
+        }
+      }
+    } else if (this.currentSource === 'cloudinary') {
+      // Handle PiP for Cloudinary (or any HTML5 audio/video element)
+      if ((this.audioPlayer as any).requestPictureInPicture) {
+        try {
+          await (this.audioPlayer as any).requestPictureInPicture();
+          console.log("PiP enabled for Cloudinary Audio");
+        } catch (err) {
+          console.error("Failed to enable PiP:", err);
         }
       }
     }
   }
+
 
 
 

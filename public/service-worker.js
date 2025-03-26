@@ -8,9 +8,12 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(self.clients.claim());
 });
 
-self.addEventListener('fetch', () => {
-  // Keep alive for background playback
+self.addEventListener("fetch", function (event) {
+  if (event.request.destination === "audio") {
+    event.respondWith(fetch(event.request));
+  }
 });
+
 
 self.addEventListener('message', (event) => {
   if (!event.data) return;
