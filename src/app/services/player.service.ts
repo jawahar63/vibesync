@@ -244,7 +244,7 @@ export class PlayerService {
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
         console.log("Chrome is inactive (backgrounded)");
-        // Do NOT pause the playback, just log it.
+        this.play();
       } else {
         console.log("Chrome is active (foreground)");
       }
