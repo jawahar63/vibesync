@@ -261,19 +261,18 @@ export class PlayerService {
     if (this.currentSource === 'youtube' && this.ytPlayer?.getIframe) {
       const videoElement = this.ytPlayer.getIframe();
 
-      // ✅ YouTube workaround for PiP (forces native player)
       try {
         videoElement.setAttribute("playsinline", "true"); // Allow inline playback on mobile
         videoElement.setAttribute("allow", "autoplay; picture-in-picture"); // Ensure PiP permission
-        videoElement.requestFullscreen(); // Try full-screen mode
-        await new Promise(resolve => setTimeout(resolve, 500)); // Wait before PiP
-        document.exitFullscreen(); // Exit fullscreen, triggering PiP
-        console.log("PiP enabled for YouTube (Workaround)");
+
+        // ✅ Open YouTube’s native PiP menu
+        videoElement.focus();
+        videoElement.click(); // Simulate user interaction to show options
+        console.log("YouTube workaround for PiP triggered.");
       } catch (err) {
         console.error("Failed to enable PiP for YouTube:", err);
       }
     } else if (this.currentSource === 'cloudinary') {
-      // ✅ Works natively for Cloudinary audio/video
       if ((this.audioPlayer as any).requestPictureInPicture) {
         try {
           await (this.audioPlayer as any).requestPictureInPicture();
@@ -284,6 +283,7 @@ export class PlayerService {
       }
     }
   }
+
 
 
 
