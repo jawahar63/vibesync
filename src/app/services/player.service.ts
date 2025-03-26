@@ -31,7 +31,6 @@ export class PlayerService {
     this.setupAudioEvents();
     this.loadYouTubeIFrameAPI();
     this.handleVisibilityChange();
-    this.listenForServiceWorkerMessages();
   }
 
   private setupAudioEvents() {
@@ -243,11 +242,15 @@ export class PlayerService {
 
   private handleVisibilityChange() {
     document.addEventListener('visibilitychange', () => {
-      if (!document.hidden && this.isPlaying$.value) {
-        this.play();
+      if (document.hidden) {
+        console.log("Chrome is inactive (backgrounded)");
+        // Do NOT pause the playback, just log it.
+      } else {
+        console.log("Chrome is active (foreground)");
       }
     });
   }
+
 
 
   //serviceWorker
@@ -257,17 +260,7 @@ export class PlayerService {
       navigator.serviceWorker.controller.postMessage({ type });
     }
   }
-  private listenForServiceWorkerMessages() {
-    if (navigator.serviceWorker) {
-      navigator.serviceWorker.addEventListener('message', (event) => {
-        if (event.data.action === 'PLAY') {
-          this.play();
-        } else if (event.data.action === 'PAUSE') {
-          this.pause();
-        }
-      });
-    }
-  }
+
 
 
 

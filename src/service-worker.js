@@ -8,6 +8,10 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(self.clients.claim());
 });
 
+self.addEventListener('fetch', () => {
+  // Keep alive for background playback
+});
+
 self.addEventListener('message', (event) => {
   if (!event.data) return;
 
