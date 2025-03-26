@@ -261,16 +261,19 @@ export class PlayerService {
     if (this.currentSource === 'youtube' && this.ytPlayer?.getIframe) {
       const videoElement = this.ytPlayer.getIframe();
 
-      if (videoElement.requestPictureInPicture) {
-        try {
-          await videoElement.requestPictureInPicture();
-          console.log("PiP enabled for YouTube");
-        } catch (err) {
-          console.error("Failed to enable PiP:", err);
-        }
+      // ✅ YouTube workaround for PiP (forces native player)
+      try {
+        videoElement.setAttribute("playsinline", "true"); // Allow inline playback on mobile
+        videoElement.setAttribute("allow", "autoplay; picture-in-picture"); // Ensure PiP permission
+        videoElement.requestFullscreen(); // Try full-screen mode
+        await new Promise(resolve => setTimeout(resolve, 500)); // Wait before PiP
+        document.exitFullscreen(); // Exit fullscreen, triggering PiP
+        console.log("PiP enabled for YouTube (Workaround)");
+      } catch (err) {
+        console.error("Failed to enable PiP for YouTube:", err);
       }
     } else if (this.currentSource === 'cloudinary') {
-      // Handle PiP for Cloudinary (or any HTML5 audio/video element)
+      // ✅ Works natively for Cloudinary audio/video
       if ((this.audioPlayer as any).requestPictureInPicture) {
         try {
           await (this.audioPlayer as any).requestPictureInPicture();
@@ -281,6 +284,7 @@ export class PlayerService {
       }
     }
   }
+
 
 
 
