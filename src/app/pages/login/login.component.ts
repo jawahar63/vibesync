@@ -45,4 +45,5 @@ export class LoginComponent implements OnInit {
   see(){
     this.pass=!this.pass
   }
+  
 }
