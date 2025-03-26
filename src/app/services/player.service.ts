@@ -172,20 +172,20 @@ export class PlayerService {
       this.ytPlayer.loadVideoById(videoId);
     } else if (window['YT'] && window['YT'].Player) {
       this.ytPlayer = new window.YT.Player('youtube-player', {
-        height: '0',
+        height: '0',  // Keep hidden
         width: '0',
         videoId: videoId,
-        playerVars: { autoplay: 1, controls: 0, modestbranding: 1 },
+        playerVars: { autoplay: 1, controls: 1, modestbranding: 1 },
         events: {
           onReady: (event: any) => {
             event.target.playVideo();
-            this.updateYtDuration();
+            this.enablePiP(event.target);
           },
           onStateChange: (event: any) => {
             if (event.data === window.YT.PlayerState.PLAYING) {
               this.updateYtProgress();
             } else if (event.data === window.YT.PlayerState.ENDED) {
-              this.musicService.skipToNext(); // ✅ Auto-play next song when video ends
+              this.musicService.skipToNext();
             }
           },
           onError: (event: any) => console.error('YouTube Player Error:', event)
@@ -195,6 +195,7 @@ export class PlayerService {
       console.error('YouTube API not loaded yet.');
     }
   }
+
 
 
 
@@ -241,23 +242,34 @@ export class PlayerService {
 
 
   private handleVisibilityChange() {
-  document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) {
-      console.log("Chrome is active (foreground)");
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        console.log("Chrome is active (foreground)");
 
-      // ✅ Resume playback if it was playing before
-      setTimeout(() => {
-          console.log("🔄 Resuming playback...");
-          this.play();
-        }, 0);
-    } else {
-      console.log("Chrome is inactive (backgrounded)");
+        // ✅ Resume playback if it was playing before
+        setTimeout(() => {
+            console.log("🔄 Resuming playback...");
+            this.play();
+          }, 0);
+      } else {
+        console.log("Chrome is inactive (backgrounded)");
 
-          console.log("🔄 Resuming playback...");
-          this.play();
-    }
-  });
-}
+            console.log("🔄 Resuming playback...");
+            this.play();
+      }
+    });
+  }
+  private enablePiP(player: any) {
+    document.addEventListener('visibilitychange', async () => {
+      if (document.hidden && player && player.getIframe) {
+        const videoElement = player.getIframe();
+        if (videoElement.requestPictureInPicture) {
+          await videoElement.requestPictureInPicture();
+        }
+      }
+    });
+  }
+
 
 
 
