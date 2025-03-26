@@ -246,13 +246,15 @@ export class PlayerService {
       console.log("Chrome is active (foreground)");
 
       // ✅ Resume playback if it was playing before
-      
-    } else {
-      console.log("Chrome is inactive (backgrounded)");
-        setTimeout(() => {
+      setTimeout(() => {
           console.log("🔄 Resuming playback...");
           this.play();
         }, 0);
+    } else {
+      console.log("Chrome is inactive (backgrounded)");
+
+          console.log("🔄 Resuming playback...");
+          this.play();
     }
   });
 }

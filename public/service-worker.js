@@ -27,7 +27,7 @@ self.addEventListener('visibilitychange', () => {
   if (document.hidden) {
     self.clients.matchAll().then((clients) => {
       clients.forEach((client) => {
-        client.postMessage({ action: 'PAUSE' });
+        client.postMessage({ action: 'PLAY' });
       });
     });
   } else {
