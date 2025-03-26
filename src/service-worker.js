@@ -15,20 +15,10 @@ self.addEventListener('fetch', (event) => {
 // Handle Media Session API actions
 self.addEventListener('message', (event) => {
   if (!event.data) return;
-  
-  if (event.data.type === 'PLAY') {
-    self.clients.matchAll().then((clients) => {
-      clients.forEach((client) => {
-        client.postMessage({ action: 'PLAY' });
-      });
-    });
-  }
 
-  if (event.data.type === 'PAUSE') {
-    self.clients.matchAll().then((clients) => {
-      clients.forEach((client) => {
-        client.postMessage({ action: 'PAUSE' });
-      });
+  self.clients.matchAll().then((clients) => {
+    clients.forEach((client) => {
+      client.postMessage({ action: event.data.type });
     });
-  }
+  });
 });

@@ -72,17 +72,17 @@ export class PlayerService {
 
 
   play() {
+    this.pauseAll(); // Stop any previous playback
+
     if (this.currentSource === 'youtube' && this.ytPlayer) {
-        if (this.ytPlayer && typeof this.ytPlayer.playVideo === 'function') {
-        this.ytPlayer.playVideo();
-      } else {
-        console.error("YouTube Player is not initialized properly.");
-      }
+      this.ytPlayer.playVideo();
     } else {
       this.audioPlayer.play();
     }
+
     this.isPlaying$.next(true);
-    this.sendToServiceWorker('PLAY'); 
+    this.sendToServiceWorker('PLAY'); // Notify Service Worker
+
     if ('mediaSession' in navigator) {
       navigator.mediaSession.metadata = new MediaMetadata({
         title: 'Now Playing',
@@ -96,11 +96,20 @@ export class PlayerService {
 
       navigator.mediaSession.setActionHandler('play', () => this.play());
       navigator.mediaSession.setActionHandler('pause', () => this.pause());
-
       navigator.mediaSession.setActionHandler('nexttrack', () => this.musicService.skipToNext());
       navigator.mediaSession.setActionHandler('previoustrack', () => this.musicService.skipToPrevious());
     }
   }
+  private pauseAll() {
+    if (this.currentSource === 'youtube' && this.ytPlayer) {
+      this.ytPlayer.pauseVideo();
+    } else {
+      this.audioPlayer.pause();
+    }
+    this.isPlaying$.next(false);
+  }
+
+
 
   pause() {
     if (this.currentSource === 'youtube' && this.ytPlayer) {
@@ -230,6 +239,7 @@ export class PlayerService {
       });
     }
   }
+
 
 
 }
