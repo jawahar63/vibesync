@@ -1,0 +1,14 @@
+<div #pipContainer *ngIf="localStorage.getItem('playerVisible') === 'true'"
+    class="fixed bottom-4 right-4 w-16 h-16 bg-black rounded-full shadow-lg flex items-center justify-center cursor-pointer transition-all duration-300"
+    [class.w-64]="expanded" [class.h-24]="expanded" (click)="toggleExpand()">
+    <img *ngIf="song$ | async as song" [src]="song.imageUrl" class="w-14 h-14 rounded-full" />
+    <div *ngIf="expanded"
+        class="absolute top-0 left-0 w-full h-full bg-black p-2 flex flex-col items-center justify-center rounded-lg shadow-md">
+        <p *ngIf="song$ | async as song" class="text-white text-sm font-bold">{{ song?.title }}</p>
+        <button class="bg-blue-500 text-white px-3 py-1 rounded mt-2" (click)="togglePlayPause()">
+            {{ (isPlaying$ | async) ? 'Pause' : 'Play' }}
+        </button>
+        <button class="text-xs text-gray-300 mt-1 underline" (click)="goToPlayer()">Open Player</button>
+        <button class="bg-green-500 text-white px-2 py-1 rounded mt-2" (click)="enterPiP()">PiP Mode</button>
+    </div>
+</div>

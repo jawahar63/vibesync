@@ -1,0 +1,58 @@
+<div class="w-full h-full p-1">
+    <div class="flex flex-row justify-center items-center h-1/12">
+        <input type="text" [(ngModel)]="searchQuery" placeholder="Search songs..." class="w-full p-2 text-white rounded-lg" />
+        <button class=" p-3 bg-blue rounded-2xl" (click)="search()">
+            <svg class="w-6 h-6 text-white" width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M21 21L17.5001 17.5M20 11.5C20 16.1944 16.1944 20 11.5 20C6.80558 20 3 16.1944 3 11.5C3 6.80558 6.80558 3 11.5 3C16.1944 3 20 6.80558 20 11.5Z"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+        </button>
+    </div>
+    <div class="w-full p-1 flex flex-row justify-start items-center gap-5">
+        <div class="p-2 text-white text-center rounded-2xl shadow-md shadow-blue transition-all delay-100 duration-300 ease-in-out"
+            [ngClass]="searchfrom === 'lastfm'?'bg-blue':'bg-black ring-1 ring-white '" (click)="changeSearchType('lastfm')">
+            lastfm
+        </div>
+        <div class="p-2 text-white text-center rounded-2xl shadow-md shadow-blue transition-all delay-100 duration-300 ease-in-out"
+            [ngClass]="searchfrom === 'yt'?'bg-blue':'bg-black ring-1 ring-white '" (click)="changeSearchType('yt')">
+            youtube</div>
+    </div>
+    
+    <div class="w-full h-10/12">
+        <ul class="h-full w-full overflow-y-scroll">
+            <li *ngFor="let song of filteredSongs"
+                class="p-3 text-white bg-black rounded-lg mb-2 flex items-center justify-between cursor-pointer hover:bg-gray-700">
+                <div class="w-11/12 flex items-center justify-start ">
+                    <img [src]="song.imageUrl || 'music.png' " class="w-12 h-12 rounded-lg mr-3" />
+                    <div>
+                        <p class="text-lg font-semibold">{{ song.title }}</p>
+                        <p class="text-sm ">{{ song.artist }}</p>
+                    </div>
+                </div>
+                <div class="relative w-1/12" (click)="toggle(song, $event)">
+                    <svg class="text-white w-6 h-6 cursor-pointer" width="100%" height="100%" viewBox="0 0 24 24" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        <path
+                            d="M12 6C12.5523 6 13 5.55228 13 5C13 4.44772 12.5523 4 12 4C11.4477 4 11 4.44772 11 5C11 5.55228 11.4477 6 12 6Z"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        <path
+                            d="M12 20C12.5523 20 13 19.5523 13 19C13 18.4477 12.5523 18 12 18C11.4477 18 11 18.4477 11 19C11 19.5523 11.4477 20 12 20Z"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+        
+                    <div *ngIf="song.showOptions"
+                        class="absolute top-full right-0 bg-blue text-black text-sm rounded-lg shadow-lg mt-2 z-10">
+                        <button (click)="addtoDB(song)" class="px-4 py-2 hover:bg-violet">add</button>
+                    </div>
+                </div>
+            </li>
+        </ul>
+        <div *ngIf="filteredSongs.length==0" class="h-full w-full text-white text-center">{{result}}
+        </div>
+    </div>
+
+</div>

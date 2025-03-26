@@ -1,0 +1,69 @@
+<div class="w-full h-full">
+    <div *ngIf="loading" class="w-full h-full flex flex-col gap-2" >
+        <div *ngFor="let i of [1,2,3,4,5]" class="w-full  flex flex-row justify-between items-center ring-1 ring-white/25 rounded-2xl p-2 animate-pulse">
+            <div class="w-1/6">
+                <div class="h-12 w-12 bg-blue opacity-75 rounded-2xl"></div>
+            </div>
+            <div class="w-5/6 flex flex-col items-center">
+                <div class="w-full h-5 bg-blue opacity-75">
+                </div>
+                <div class="w-1/2 h-5 bg-blue opacity-75">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="error" class="w-full h-full flex justify-center items-center text-2xl text-white">{{error}}
+    </div>
+    <div *ngIf="!loading" class="w-full h-full ">
+        <div class="w-full h-1/12 p-1 flex flex-row justify-center items-center gap-5  rounded-2xl">
+            <div class= " w-fit p-1.5 text-white rounded-2xl bg-blue " (click)="play()">
+                <svg class="w-8 h-8" width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M5 4.98951C5 4.01835 5 3.53277 5.20249 3.2651C5.37889 3.03191 5.64852 2.88761 5.9404 2.87018C6.27544 2.85017 6.67946 3.11953 7.48752 3.65823L18.0031 10.6686C18.6708 11.1137 19.0046 11.3363 19.1209 11.6168C19.2227 11.8621 19.2227 12.1377 19.1209 12.383C19.0046 12.6635 18.6708 12.886 18.0031 13.3312L7.48752 20.3415C6.67946 20.8802 6.27544 21.1496 5.9404 21.1296C5.64852 21.1122 5.37889 20.9679 5.20249 20.7347C5 20.467 5 19.9814 5 19.0103V4.98951Z"
+                        stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </div>
+            <div class=" w-fit p-1.5 text-white rounded-2xl bg-blue " (click)="shuffle()">
+                <svg class="w-8 h-8" width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17 4V20M17 20L13 16M17 20L21 16M7 20V4M7 4L3 8M7 4L11 8" stroke="currentColor" stroke-width="1"
+                        stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </div>
+        </div>
+        <div class="w-full h-11/12 p-1 flex flex-col gap-0.5 overflow-y-scroll">
+            <div *ngFor="let song of songs" class="w-full  flex flex-row justify-between items-center  rounded-2xl p-2">
+                <div class="w-11/12  flex flex-row justify-evenly items-center" (click)="playSong(song)">
+                    <div class="w-3/12">
+                        <img class="h-12 w-12 rounded-2xl" [src]="song.imageUrl || 'music.png'" alt="song">
+                    </div>
+                    <div class="w-9/12 flex flex-col items-center">
+                        <p class="w-full truncate text-lg text-white">{{song.title}}</p>
+                        <p class="w-full truncate text-sm text-white">{{song.artist}}</p>
+                    </div>
+                </div>
+                <div class="relative w-1/12" (click)="toggle(song, $event)">
+                    <svg class="text-white w-6 h-6 cursor-pointer" width="100%" height="100%" viewBox="0 0 24 24" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        <path
+                            d="M12 6C12.5523 6 13 5.55228 13 5C13 4.44772 12.5523 4 12 4C11.4477 4 11 4.44772 11 5C11 5.55228 11.4477 6 12 6Z"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        <path
+                            d="M12 20C12.5523 20 13 19.5523 13 19C13 18.4477 12.5523 18 12 18C11.4477 18 11 18.4477 11 19C11 19.5523 11.4477 20 12 20Z"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                
+                    <div *ngIf="song.showOptions"
+                        class="absolute top-full right-0 bg-blue text-black text-sm rounded-lg shadow-lg mt-2 z-10">
+                        <button (click)="addtoQueueNext(song)" class="px-4 py-2 hover:bg-violet">Play next</button>
+                        <button (click)="addToQueue(song)" class="px-4 py-2 hover:bg-violet">Add to Queue</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+

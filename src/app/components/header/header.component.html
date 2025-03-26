@@ -1,0 +1,26 @@
+<div *ngIf="islogin"
+    class="w-full p-1.5 bg-blue rounded-b-2xl flex justify-between items-center flex-row">
+    <h1 class="text-black font-bold text-xl ms-1">VibeSync</h1>
+    <!-- <div *ngIf="isAdmin" class="bg-black p-3 rounded-2xl" (click)="upload()">
+    <svg class="text-white w-5 h-5" width="100%" height="100%" viewBox="0 0 24 24" fill="none"
+      xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M21 15V16.2C21 17.8802 21 18.7202 20.673 19.362C20.3854 19.9265 19.9265 20.3854 19.362 20.673C18.7202 21 17.8802 21 16.2 21H7.8C6.11984 21 5.27976 21 4.63803 20.673C4.07354 20.3854 3.6146 19.9265 3.32698 19.362C3 18.7202 3 17.8802 3 16.2V15M17 8L12 3M12 3L7 8M12 3V15"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+  </div> -->
+    <div class="flex flex-justify-center items-center">
+        <div class="bg-black p-2.5 rounded-s-2xl flex flex-row justify-center items-center gap-1 border-r-1 border-white">
+            <p class="text-white text-">{{username}}</p>
+        </div>
+        <div class="bg-black p-2.5 rounded-e-2xl flex flex-row justify-center items-center gap-1" (click)="logout()">
+
+            <svg class="text-white w-6 h-6" width="100%" height="100%" viewBox="0 0 24 24" fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M16 17L21 12M21 12L16 7M21 12H9M9 3H7.8C6.11984 3 5.27976 3 4.63803 3.32698C4.07354 3.6146 3.6146 4.07354 3.32698 4.63803C3 5.27976 3 6.11984 3 7.8V16.2C3 17.8802 3 18.7202 3.32698 19.362C3.6146 19.9265 4.07354 20.3854 4.63803 20.673C5.27976 21 6.11984 21 7.8 21H9"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+        </div>
+    </div>
+</div>

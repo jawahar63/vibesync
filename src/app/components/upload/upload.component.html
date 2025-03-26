@@ -1,0 +1,17 @@
+<div class="text-white p-5">
+    <h2 class="text-2xl font-bold">Upload Song</h2>
+
+    <label for="audioInput">Select Audio File:</label>
+    <input id="audioInput" type="file" (change)="onFileSelect($event, 'audio')" accept="audio/*" />
+    <p *ngIf="selectedAudioFile">{{ selectedAudioFile.name }}</p>
+
+    <label for="imageInput">Select Cover Image (Optional):</label>
+    <input id="imageInput" type="file" (change)="onFileSelect($event, 'image')" accept="image/*" />
+    <p *ngIf="selectedImageFile">{{ selectedImageFile.name }}</p>
+
+    <button (click)="uploadFiles()" [disabled]="isUploading">
+        {{ isUploading ? 'Uploading...' : 'Upload' }}
+    </button>
+
+    <p *ngIf="uploadMessage">{{ uploadMessage }}</p>
+</div>

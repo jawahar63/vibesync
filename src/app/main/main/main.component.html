@@ -1,0 +1,48 @@
+<!-- <div class=" bg-gray-900 text-white min-h-screen "> -->
+
+<!-- <app-login class="w-full h-full"></app-login> -->
+<!-- <h1 class="text-3xl font-bold text-center mb-4">🎵 Music PWA 🎵</h1>
+
+
+  <app-upload></app-upload>
+  <input type="text" [(ngModel)]="searchQuery" (input)="filterSongs()" placeholder="Search songs..."
+    class="w-full p-2 text-black rounded-lg" />
+
+
+  
+  <h2 class="text-xl font-semibold mt-4">All Songs</h2>
+  <ul>
+    <li *ngFor="let song of filteredSongs" (click)="playSong(song)"
+      class="p-3 bg-gray-800 rounded-lg mb-2 flex items-center cursor-pointer hover:bg-gray-700">
+      <img [src]="song.albumArt || 'default.jpg'" class="w-12 h-12 rounded-lg mr-3" />
+      <div>
+        <p class="text-lg font-semibold">{{ song.title }}</p>
+        <p class="text-sm text-gray-400">{{ song.artist }}</p>
+      </div>
+    </li>
+  </ul>
+
+  
+  <app-music-player *ngIf="currentSong" [cloudinaryUrl]="currentSong.audioUrl"></app-music-player> -->
+<!-- </div> -->
+
+<!-- Music Player (Fixed at Bottom) -->
+<div class="h-full w-full bg-black select-none">
+    <app-header class="shadow-md shadow-violet"></app-header>
+    <app-music-player *ngIf="currentSong.title !== '' && islogin "
+        class="fixed bottom-14 left-0 w-full z-50 p-1">
+    </app-music-player>
+
+    <div *ngIf="islogin" [ngClass]="isPlaying?'h-[78%]':'h-[87%]'" class="p-2">
+        <router-outlet class="w-full h-full"></router-outlet>
+    </div>
+    <!-- <div *ngIf="islogin && isPlaying" class="h-9/12 p-2">
+      <router-outlet class="w-full h-full"></router-outlet>
+    </div> -->
+    
+    <div *ngIf="!islogin" class="w-full h-full">
+      <router-outlet class="w-full h-full"></router-outlet>
+    </div>
+    <app-bottom-nav *ngIf="islogin" class="fixed bottom-0 left-0 w-full"/>
+</div>
+
