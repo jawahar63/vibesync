@@ -58,6 +58,8 @@ export class PlayerService {
 
 
   setAudioSource(song: Song) {
+    this.pauseAll(); // Stop any previous playback
+
     if (song.isYt && song.audioUrl) {
       this.currentSource = 'youtube';
       this.loadYouTubePlayer(song.audioUrl);
@@ -67,8 +69,27 @@ export class PlayerService {
       this.audioPlayer.load();
     } else {
       console.error('Invalid song source:', song);
+      return;
+    }
+
+    // ✅ Update Media Session API for Cloudinary & YouTube
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: song.title || 'Now Playing',
+        artist: song.artist || 'Unknown Artist',
+        album: 'VibeSync Player',
+        artwork: [{ src: song.imageUrl || 'assets/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' }]
+      });
+
+      // ✅ Ensure Next & Previous buttons work for both sources
+      navigator.mediaSession.setActionHandler('nexttrack', () => this.musicService.skipToNext());
+      navigator.mediaSession.setActionHandler('previoustrack', () => this.musicService.skipToPrevious());
+
+      navigator.mediaSession.setActionHandler('play', () => this.play());
+      navigator.mediaSession.setActionHandler('pause', () => this.pause());
     }
   }
+
 
 
   play() {
