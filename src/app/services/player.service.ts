@@ -30,7 +30,7 @@ export class PlayerService {
   constructor(private musicService: MusicService) {
     this.setupAudioEvents();
     this.loadYouTubeIFrameAPI();
-    
+    this.handleVisibilityChange();
   }
 
   private setupAudioEvents() {
@@ -81,6 +81,20 @@ export class PlayerService {
       this.audioPlayer.play();
     }
     this.isPlaying$.next(true);
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: 'Now Playing',
+        artist: 'VibeSync',
+        album: 'VibeSync Player',
+        artwork: [
+          { src: 'assets/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
+          { src: 'assets/icons/icon-512x512.png', sizes: '512x512', type: 'image/png' }
+        ]
+      });
+
+      navigator.mediaSession.setActionHandler('play', () => this.play());
+      navigator.mediaSession.setActionHandler('pause', () => this.pause());
+    }
   }
 
   pause() {
@@ -181,6 +195,18 @@ export class PlayerService {
     };
     update();
   }
+
+
+  private handleVisibilityChange() {
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      this.pause(); 
+    } else if (this.isPlaying$.value) {
+      this.play(); 
+    }
+  });
+}
+
 
 }
 

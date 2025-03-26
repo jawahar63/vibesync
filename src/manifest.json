@@ -1,5 +1,5 @@
 {
-  "name": "vibesync",
+  "name": "VibeSync",
   "short_name": "Music",
   "start_url": "/",
   "display": "standalone",
@@ -16,5 +16,7 @@
       "sizes": "512x512",
       "type": "image/png"
     }
-  ]
+  ],
+  "permissions": ["audio"],
+  "categories": ["music", "audio", "entertainment"]
 }
