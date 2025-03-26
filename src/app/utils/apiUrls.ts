@@ -1,1 +1,3 @@
-export const backend = 'http://localhost:5000/api';
+import { environment } from "../../environments/environment.development";
+
+export const backend = environment.Backend;
