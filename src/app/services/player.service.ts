@@ -180,6 +180,7 @@ export class PlayerService {
           onReady: (event: any) => {
             event.target.playVideo();
             this.enablePiPLocal(event.target);
+            this.updateYtDuration();
           },
           onStateChange: (event: any) => {
             if (event.data === window.YT.PlayerState.PLAYING) {
@@ -245,7 +246,8 @@ export class PlayerService {
     document.addEventListener('visibilitychange', async () => {
       if (document.hidden && this.isMobile() && this.isPWA()) {
         console.log("App is in background or phone is locked (PWA Mobile). Enabling PiP...");
-        await this.enablePiP(); // Enable PiP only on PWA & mobile
+        await this.enablePiP();
+        
       }
     });
   }
