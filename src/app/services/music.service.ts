@@ -4,15 +4,19 @@ import { BehaviorSubject, catchError, Observable, of, tap } from 'rxjs';
 import { Song } from '../model/song.model';
 import { backend } from '../utils/apiUrls';
 import { Queue } from '../model/queue.model';
+declare var YT: any;
 
 @Injectable({
   providedIn: 'root'
 })
 export class MusicService {
   private API_URL = backend;
+  private youTubePlayer?: any;
 
-  constructor(private http: HttpClient) {}
-
+  constructor(private http: HttpClient) {
+    
+  }
+  
   public currentSong =  new BehaviorSubject<Song>({_id:'',title:'',artist:'',genre:'',album:'',imageUrl:'',audioUrl:'',liked:false});
   private isPlayingSubject = new BehaviorSubject<boolean>(false);
   isPlaying$ = this.isPlayingSubject.asObservable();
@@ -203,20 +207,17 @@ export class MusicService {
   }
 
   //song cache
-  async getAudioBlob(song: Song): Promise<Blob> {
-    // Check cache first
+  async getAudioBlob(song: Song): Promise<string | Blob> {
+    if (song.isYt) {
+      return song.audioUrl;
+    }
+
     if (this.audioCache.has(song.audioUrl)) {
       return this.audioCache.get(song.audioUrl)!;
     }
 
-    // Fetch audio data if not cached
-    const streamUrl = song.isYt
-      ? `${this.API_URL}/songs/stream?url=${encodeURIComponent(song.audioUrl)}`
-      : `${this.API_URL}/songs/stream/cloud?url=${encodeURIComponent(song.audioUrl)}`;
-
-    const audioBlob = await this.http.get(streamUrl, { responseType: 'blob',
-      headers:this.header
-     },).toPromise();
+    const streamUrl = `${this.API_URL}/songs/stream/cloud?url=${encodeURIComponent(song.audioUrl)}`;
+    const audioBlob = await this.http.get(streamUrl, { responseType: 'blob', headers: this.header }).toPromise();
     this.audioCache.set(song.audioUrl, audioBlob!);
     return audioBlob!;
   }

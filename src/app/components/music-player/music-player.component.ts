@@ -46,16 +46,24 @@ export class MusicPlayerComponent implements OnInit {
 
   async updateCurrentSong(song: Song) {
     this.currentSong = song;
-    
-    const audioBlob = await this.musicService.getAudioBlob(song);
-    const streamUrl = URL.createObjectURL(audioBlob);
 
-    this.playerService.setAudioSource(streamUrl);
-    this.playerService.play();
+    if (song.isYt) {
+      this.playerService.setAudioSource(song);
+      this.playerService.play();
+    } else {
+      const audioBlob = await this.musicService.getAudioBlob(song);
+      if (audioBlob instanceof Blob) {
+        const streamUrl = URL.createObjectURL(audioBlob);
+        song.audioUrl = streamUrl;
+        this.playerService.setAudioSource(song);
+        this.playerService.play();
+      }
+    }
   }
 
+
   togglePlayPause() {
-    this.playerService.togglePlayPause();
+    this.isPlaying ? this.playerService.pause() : this.playerService.play(); // ✅ Fixed missing method
   }
 
   skipNext() {
@@ -67,11 +75,11 @@ export class MusicPlayerComponent implements OnInit {
   }
 
   seek(event: any) {
-    this.playerService.seekTo(event.target.value);
+    this.playerService.setCurrentTime(event.target.value); // ✅ Use public method
   }
 
   changeVolume(event: any) {
-    this.playerService.setVolume(event.target.value);
+    this.playerService.setVolume(event.target.value); // ✅ Use public method
   }
   openPlay(){
     this.router.navigate(['music']);

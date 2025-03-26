@@ -1,64 +1,100 @@
-import { inject, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { MusicService } from './music.service';
+import { Song } from '../model/song.model';
+declare global {
+  interface Window {
+    YT: any;
+    onYouTubeIframeAPIReady?: () => void;
+  }
+}
+
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class PlayerService {
   private audioPlayer: HTMLAudioElement = new Audio();
+  private ytPlayer?: any;
+  private currentSource: 'youtube' | 'cloudinary' | null = null;
 
-  
   isMiniPlayerOpen$ = new BehaviorSubject<boolean>(false);
-  isplayerOpen$ =new BehaviorSubject<boolean>(false);
+   isplayerOpen$ =new BehaviorSubject<boolean>(false);
   isPlaying$ = new BehaviorSubject<boolean>(false);
   currentTime$ = new BehaviorSubject<string>('0:00');
   totalDuration$ = new BehaviorSubject<string>('0:00');
   progress$ = new BehaviorSubject<number>(0);
-  volume$ = new BehaviorSubject<number>(1); // Default volume at max (1)
-  musicServices=inject(MusicService);
+  volume$ = new BehaviorSubject<number>(1);
+  
+  constructor(private musicService: MusicService) {
+    this.setupAudioEvents();
+    this.loadYouTubeIFrameAPI();
+    
+  }
 
-  constructor() {
+  private setupAudioEvents() {
     this.audioPlayer.addEventListener('timeupdate', () => this.updateProgress());
     this.audioPlayer.addEventListener('loadedmetadata', () => this.setDuration());
-    this.audioPlayer.addEventListener('ended', () => this.onSongEnd());
-
+    this.audioPlayer.addEventListener('ended', () => this.musicService.skipToNext());
     this.audioPlayer.addEventListener('play', () => this.isPlaying$.next(true));
     this.audioPlayer.addEventListener('pause', () => this.isPlaying$.next(false));
   }
 
-  setAudioSource(src: string) {
-    this.audioPlayer.src = src;
-    this.audioPlayer.load();
+  private loadYouTubeIFrameAPI() {
+    if (!(window as any)['YT']) {
+      const script = document.createElement('script');
+      script.src = 'https://www.youtube.com/iframe_api';
+      script.onload = () => {
+        (window as any)['onYouTubeIframeAPIReady'] = () => {
+          console.log('YouTube API Loaded');
+        };
+      };
+      document.body.appendChild(script);
+    }
   }
 
+
+
+  setAudioSource(song: Song) {
+    if (song.isYt && song.audioUrl) {
+      this.currentSource = 'youtube';
+      this.loadYouTubePlayer(song.audioUrl);
+    } else if (song.audioUrl) {
+      this.currentSource = 'cloudinary';
+      this.audioPlayer.src = song.audioUrl;
+      this.audioPlayer.load();
+    } else {
+      console.error('Invalid song source:', song);
+    }
+  }
+
+
   play() {
-    this.audioPlayer.play();
+    if (this.currentSource === 'youtube' && this.ytPlayer) {
+        if (this.ytPlayer && typeof this.ytPlayer.playVideo === 'function') {
+        this.ytPlayer.playVideo();
+      } else {
+        console.error("YouTube Player is not initialized properly.");
+      }
+    } else {
+      this.audioPlayer.play();
+    }
     this.isPlaying$.next(true);
   }
 
   pause() {
-    this.audioPlayer.pause();
+    if (this.currentSource === 'youtube' && this.ytPlayer) {
+      this.ytPlayer.pauseVideo();
+    } else {
+      this.audioPlayer.pause();
+    }
     this.isPlaying$.next(false);
-  }
-
-  togglePlayPause() {
-    this.audioPlayer.paused ? this.play() : this.pause();
-  }
-
-  seekTo(percentage: number) {
-    const seekTime = (percentage / 100) * this.audioPlayer.duration;
-    this.audioPlayer.currentTime = seekTime;
-  }
-
-  setVolume(volume: number) {
-    this.audioPlayer.volume = volume;
-    this.volume$.next(volume);
   }
 
   private updateProgress() {
     const currentTime = this.audioPlayer.currentTime;
-    const duration = this.audioPlayer.duration || 1; // Prevent division by zero
+    const duration = this.audioPlayer.duration || 1;
     this.currentTime$.next(this.formatTime(currentTime));
     this.progress$.next((currentTime / duration) * 100);
   }
@@ -74,9 +110,77 @@ export class PlayerService {
     return `${min}:${sec < 10 ? '0' : ''}${sec}`;
   }
 
-  private onSongEnd() {
-    console.log('Song ended, implement next song logic.');
-    this.musicServices.skipToNext();
+  private loadYouTubePlayer(videoUrl: string) {
+    const videoId = this.extractYouTubeVideoID(videoUrl);
+    if (!videoId) return;
+
+    if (this.ytPlayer) {
+      this.ytPlayer.loadVideoById(videoId);
+    } else if (window['YT'] && window['YT'].Player) {
+      this.ytPlayer = new window.YT.Player('youtube-player', {
+        height: '0',
+        width: '0',
+        videoId: videoId,
+        playerVars: { autoplay: 1, controls: 0, modestbranding: 1 },
+        events: {
+          onReady: (event: any) => {
+            event.target.playVideo();
+            this.updateYtDuration();
+          },
+          onStateChange: (event: any) => {
+            if (event.data === window.YT.PlayerState.PLAYING) {
+              this.updateYtProgress();
+            }
+          },
+          onError: (event: any) => console.error('YouTube Player Error:', event)
+        }
+      });
+    } else {
+      console.error('YouTube API not loaded yet.');
+    }
+  }
+
+
+
+  private extractYouTubeVideoID(url: string): string | null {
+    const regExp = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+    const match = url.match(regExp);
+    return match ? match[1] : null;
+  }
+
+  setVolume(volume: number) {
+    this.audioPlayer.volume = volume;
+  }
+  setCurrentTime(time: number) {
+  if (this.currentSource === 'youtube' && this.ytPlayer) {
+    this.ytPlayer.seekTo(time, true); 
+  } else {
+    this.audioPlayer.currentTime = time;
+  }
+}
+
+  private updateYtDuration() {
+    if (this.ytPlayer && typeof this.ytPlayer.getDuration === 'function') {
+      const duration = this.ytPlayer.getDuration();
+      this.totalDuration$.next(this.formatTime(duration));
+    }
+  }
+
+  private updateYtProgress() {
+    const update = () => {
+      if (this.ytPlayer && typeof this.ytPlayer.getCurrentTime === 'function') {
+        const currentTime = this.ytPlayer.getCurrentTime();
+        const duration = this.ytPlayer.getDuration() || 1;
+        this.currentTime$.next(this.formatTime(currentTime));
+        this.progress$.next((currentTime / duration) * 100);
+
+        if (this.ytPlayer.getPlayerState() === window.YT.PlayerState.PLAYING) {
+          requestAnimationFrame(update);
+        }
+      }
+    };
+    update();
   }
 
 }
+

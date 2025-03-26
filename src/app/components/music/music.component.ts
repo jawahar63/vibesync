@@ -42,7 +42,7 @@ export class MusicComponent implements OnInit, OnDestroy {
   }
 
   togglePlayPause() {
-    this.playerService.togglePlayPause();
+    this.isPlaying ? this.playerService.pause() : this.playerService.play(); // ✅ Fixed missing method
   }
 
   skipNext() {
@@ -54,7 +54,7 @@ export class MusicComponent implements OnInit, OnDestroy {
   }
 
   seek(event: any) {
-    this.playerService.seekTo(event.target.value);
+    this.playerService.setCurrentTime(event.target.value); // ✅ Use public method
   }
   like(){
     if(this.currentSong){
