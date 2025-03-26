@@ -247,7 +247,7 @@ export class PlayerService {
       if (document.hidden && this.isMobile() && this.isPWA()) {
         console.log("App is in background or phone is locked (PWA Mobile). Enabling PiP...");
         await this.enablePiP();
-        
+
       }
     });
   }
@@ -267,7 +267,7 @@ export class PlayerService {
 
   private async enablePiP() {
   if (document.pictureInPictureElement) return; // Already in PiP mode
-
+  console.log(1)
     if (this.ytPlayer && this.ytPlayer.getIframe) {
       const videoElement = this.ytPlayer.getIframe();
 
