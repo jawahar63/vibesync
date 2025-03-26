@@ -83,6 +83,7 @@ export class PlayerService {
     this.isPlaying$.next(true);
     this.sendToServiceWorker('PLAY'); // Notify Service Worker
 
+    // ✅ Set up Media Session API with next/prev buttons
     if ('mediaSession' in navigator) {
       navigator.mediaSession.metadata = new MediaMetadata({
         title: 'Now Playing',
@@ -94,12 +95,16 @@ export class PlayerService {
         ]
       });
 
-      navigator.mediaSession.setActionHandler('play', () => this.play());
-      navigator.mediaSession.setActionHandler('pause', () => this.pause());
+      // ✅ Add Next & Previous Track Controls
       navigator.mediaSession.setActionHandler('nexttrack', () => this.musicService.skipToNext());
       navigator.mediaSession.setActionHandler('previoustrack', () => this.musicService.skipToPrevious());
+
+      // Play/Pause Controls
+      navigator.mediaSession.setActionHandler('play', () => this.play());
+      navigator.mediaSession.setActionHandler('pause', () => this.pause());
     }
   }
+
   private pauseAll() {
     if (this.currentSource === 'youtube' && this.ytPlayer) {
       this.ytPlayer.pauseVideo();
@@ -159,6 +164,8 @@ export class PlayerService {
           onStateChange: (event: any) => {
             if (event.data === window.YT.PlayerState.PLAYING) {
               this.updateYtProgress();
+            } else if (event.data === window.YT.PlayerState.ENDED) {
+              this.musicService.skipToNext(); // ✅ Auto-play next song when video ends
             }
           },
           onError: (event: any) => console.error('YouTube Player Error:', event)
@@ -168,6 +175,7 @@ export class PlayerService {
       console.error('YouTube API not loaded yet.');
     }
   }
+
 
 
 
@@ -239,6 +247,7 @@ export class PlayerService {
       });
     }
   }
+
 
 
 

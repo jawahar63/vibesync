@@ -8,11 +8,6 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(self.clients.claim());
 });
 
-self.addEventListener('fetch', (event) => {
-  // Let the browser handle fetch requests
-});
-
-// Handle Media Session API actions
 self.addEventListener('message', (event) => {
   if (!event.data) return;
 
@@ -21,4 +16,21 @@ self.addEventListener('message', (event) => {
       client.postMessage({ action: event.data.type });
     });
   });
+});
+
+// Prevent YouTube iframe from suspending
+self.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    self.clients.matchAll().then((clients) => {
+      clients.forEach((client) => {
+        client.postMessage({ action: 'PAUSE' });
+      });
+    });
+  } else {
+    self.clients.matchAll().then((clients) => {
+      clients.forEach((client) => {
+        client.postMessage({ action: 'PLAY' });
+      });
+    });
+  }
 });
