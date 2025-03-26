@@ -74,9 +74,9 @@ export class MusicPlayerComponent implements OnInit {
     this.musicService.skipToPrevious();
   }
 
-  seek(event: any) {
-    this.playerService.setCurrentTime(event.target.value); // ✅ Use public method
-  }
+  // seek(event: any) {
+  //   this.playerService.setCurrentTime(event.target.value); // ✅ Use public method
+  // }
 
   changeVolume(event: any) {
     this.playerService.setVolume(event.target.value); // ✅ Use public method
