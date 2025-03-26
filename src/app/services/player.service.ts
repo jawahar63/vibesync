@@ -31,6 +31,7 @@ export class PlayerService {
     this.setupAudioEvents();
     this.loadYouTubeIFrameAPI();
     this.handleVisibilityChange();
+    this.listenForServiceWorkerMessages();
   }
 
   private setupAudioEvents() {
@@ -81,6 +82,7 @@ export class PlayerService {
       this.audioPlayer.play();
     }
     this.isPlaying$.next(true);
+    this.sendToServiceWorker('PLAY'); 
     if ('mediaSession' in navigator) {
       navigator.mediaSession.metadata = new MediaMetadata({
         title: 'Now Playing',
@@ -94,6 +96,9 @@ export class PlayerService {
 
       navigator.mediaSession.setActionHandler('play', () => this.play());
       navigator.mediaSession.setActionHandler('pause', () => this.pause());
+
+      navigator.mediaSession.setActionHandler('nexttrack', () => this.musicService.skipToNext());
+      navigator.mediaSession.setActionHandler('previoustrack', () => this.musicService.skipToPrevious());
     }
   }
 
@@ -104,6 +109,7 @@ export class PlayerService {
       this.audioPlayer.pause();
     }
     this.isPlaying$.next(false);
+    this.sendToServiceWorker('PAUSE');
   }
 
   private updateProgress() {
@@ -198,14 +204,32 @@ export class PlayerService {
 
 
   private handleVisibilityChange() {
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-      this.pause(); 
-    } else if (this.isPlaying$.value) {
-      this.play(); 
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && this.isPlaying$.value) {
+        this.play();
+      }
+    });
+  }
+
+
+  //serviceWorker
+
+  private sendToServiceWorker(type: 'PLAY' | 'PAUSE') {
+    if (navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage({ type });
     }
-  });
-}
+  }
+  private listenForServiceWorkerMessages() {
+    if (navigator.serviceWorker) {
+      navigator.serviceWorker.addEventListener('message', (event) => {
+        if (event.data.action === 'PLAY') {
+          this.play();
+        } else if (event.data.action === 'PAUSE') {
+          this.pause();
+        }
+      });
+    }
+  }
 
 
 }
