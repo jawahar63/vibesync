@@ -18,5 +18,6 @@
     }
   ],
   "permissions": ["audio"],
-  "categories": ["music", "audio", "entertainment"]
+  "categories": ["music", "audio", "entertainment"],
+  "background_mode": "enabled"
 }
