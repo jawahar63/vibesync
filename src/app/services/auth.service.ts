@@ -21,6 +21,7 @@ export class AuthService {
   }
 
   login(username: string, password: string) {
+    username = username.toLocaleLowerCase();
     return this.http.post<{
       username: string; token: string, role: string 
 }>(`${this.API_URL}/auth/login`, { username, password });
