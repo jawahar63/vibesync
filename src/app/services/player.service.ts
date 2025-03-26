@@ -297,7 +297,7 @@ export class PlayerService {
   }
 
   private isPWA(): boolean {
-    return (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true);
+    return window.matchMedia('(display-mode: standalone)').matches || document.referrer.startsWith('android-app://');
   }
 
 
