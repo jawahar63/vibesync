@@ -36,9 +36,6 @@
     <div *ngIf="islogin" [ngClass]="isPlaying?'h-[78%]':'h-[87%]'" class="p-2">
         <router-outlet class="w-full h-full"></router-outlet>
     </div>
-    <!-- <div *ngIf="islogin && isPlaying" class="h-9/12 p-2">
-      <router-outlet class="w-full h-full"></router-outlet>
-    </div> -->
     
     <div *ngIf="!islogin" class="w-full h-full">
       <router-outlet class="w-full h-full"></router-outlet>
