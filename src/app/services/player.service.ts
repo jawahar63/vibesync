@@ -255,20 +255,25 @@ export class PlayerService {
 
 
   private async enablePiP() {
-    if (document.pictureInPictureElement) return; // Prevent multiple PiP calls
+    if (document.pictureInPictureElement) return; 
     console.log("Attempting to enable PiP...");
 
     if (this.currentSource === 'youtube' && this.ytPlayer?.getIframe) {
       const videoElement = this.ytPlayer.getIframe();
 
       try {
-        videoElement.setAttribute("playsinline", "true"); // Allow inline playback on mobile
-        videoElement.setAttribute("allow", "autoplay; picture-in-picture"); // Ensure PiP permission
+        // ✅ Apply CSS scaling to simulate a smaller PiP
+        videoElement.style.transform = "scale(0.3)"; // Shrinks to 30% size
+        videoElement.style.transformOrigin = "top left"; // Anchors to top-left
+        videoElement.style.width = "100px"; // Restricts width
+        videoElement.style.height = "100px"; // Restricts height
 
-        // ✅ Open YouTube’s native PiP menu
-        videoElement.focus();
-        videoElement.click(); // Simulate user interaction to show options
-        console.log("YouTube workaround for PiP triggered.");
+        // ✅ Allow PiP
+        videoElement.setAttribute("playsinline", "true");
+        videoElement.setAttribute("allow", "autoplay; picture-in-picture");
+
+        await videoElement.requestPictureInPicture();
+        console.log("YouTube PiP enabled with scaling.");
       } catch (err) {
         console.error("Failed to enable PiP for YouTube:", err);
       }
